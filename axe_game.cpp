@@ -92,12 +92,12 @@ int main() {
         BeginDrawing();
         ClearBackground(WHITE);
 
-        if (gameOver) {
+        if (gameOver || score > 9) {
             DrawTexture(texture,  screenWidth / 2 - 100 , screenHeight / 2 - 200 , WHITE);
             DrawText("Game Over", screenWidth / 2 - 100, screenHeight / 2 - 30, 60, RED);
         } else {
             // Display score
-            DrawText(to_string(score).c_str(), 20, 20, 60, RED);
+            DrawText(("Score: " + std::to_string(score)).c_str(), 20, 20, 30, RED);
 
             // Draw player (circle) and axe (square)
             DrawCircle(playerX, playerY, playerRadius, BLUE);
