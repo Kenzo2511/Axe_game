@@ -73,6 +73,7 @@ int main() {
     int frameCounter = 0;
 
     SetTargetFPS(30);
+    Texture2D texture = LoadTexture("./image/10_point_meme.png");
 
     while (!WindowShouldClose()) {
         frameCounter++;
@@ -92,6 +93,7 @@ int main() {
         ClearBackground(WHITE);
 
         if (gameOver) {
+            DrawTexture(texture,  screenWidth / 2 - 100 , screenHeight / 2 - 200 , WHITE);
             DrawText("Game Over", screenWidth / 2 - 100, screenHeight / 2 - 30, 60, RED);
         } else {
             // Display score
