@@ -1,103 +1,112 @@
 #include "raylib.h"
+#include <string>
+#include <iostream>
+using namespace std;
 
-struct Boundary{
+struct Boundary {
     int left_x;
     int right_x;
     int upper_y;
     int bottom_y;
 };
 
-// Function to get the boundary of a circle
-Boundary getCircleBound(int circle_x, int circle_y, int circle_radius){
+// Returns the boundary of a circle
+Boundary getCircleBoundary(int x, int y, int radius) {
     return { 
-        circle_x - circle_radius, 
-        circle_x + circle_radius, 
-        circle_y - circle_radius, 
-        circle_y + circle_radius 
+        x - radius, 
+        x + radius, 
+        y - radius, 
+        y + radius 
     };
 }
 
-// Function to get the boundary of a rectangle (square in your case)
-Boundary getRectangleBound(int rectangle_x, int rectangle_y, int rectangle_length){
+// Returns the boundary of a square
+Boundary getSquareBoundary(int x, int y, int length) {
     return { 
-        rectangle_x, 
-        rectangle_x + rectangle_length, 
-        rectangle_y, 
-        rectangle_y + rectangle_length 
+        x, 
+        x + length, 
+        y, 
+        y + length 
     };
 }
 
-// Function to check collision between two boundaries
-bool hasCollision(const Boundary &circleBound, const Boundary &rectangleBound){
-    return (rectangleBound.left_x <= circleBound.right_x) && 
-           (rectangleBound.right_x >= circleBound.left_x) && 
-           (rectangleBound.upper_y <= circleBound.bottom_y) && 
-           (rectangleBound.bottom_y >= circleBound.upper_y);
+// Checks if two boundaries overlap (collision)
+bool checkCollision(const Boundary &circle, const Boundary &square) {
+    return (square.left_x <= circle.right_x) && 
+           (square.right_x >= circle.left_x) && 
+           (square.upper_y <= circle.bottom_y) && 
+           (square.bottom_y >= circle.upper_y);
 }
 
-// Function to move the player to the right
-void moveRight(int &x, const int width){
-    if (IsKeyDown(KEY_D) && x < width){
+// Moves the player to the right within the screen width
+void moveRight(int &x, const int screenWidth) {
+    if (IsKeyDown(KEY_D) && x < screenWidth) {
         x += 10;
     }
 }
 
-// Function to move the player to the left
-void moveLeft(int &x, const int width){
-    if (IsKeyDown(KEY_A) && x > 0){
+// Moves the player to the left within the screen width
+void moveLeft(int &x, const int screenWidth) {
+    if (IsKeyDown(KEY_A) && x > 0) {
         x -= 10;
     }
 }
 
-int main(){
-    const int width = 800;
-    const int height = 450;
-    InitWindow(width, height, "Game's window");
+int main() {
+    const int screenWidth = 800;
+    const int screenHeight = 450;
+    InitWindow(screenWidth, screenHeight, "Game's Window");
 
     // Circle parameters
-    int circle_x = 400;
-    int circle_y = 225;
-    const int circle_radius = 25;
+    int playerX = screenWidth / 2;
+    int playerY = screenHeight / 2;
+    const int playerRadius = 25;
 
-    // Axe (rectangle) parameters
-    int axe_x = 500;
-    int axe_y = 0;
-    const int axe_length = 50;
-    int direction = 10;
+    // Axe (square) parameters
+    int axeX = 500;
+    int axeY = 0;
+    const int axeSize = 50;
+    int axeDirection = 10;
 
-    bool collision_with_axe = false;
+    bool gameOver = false;
+    int score = 0;
+    int frameCounter = 0;
 
     SetTargetFPS(30);
 
-    while(!WindowShouldClose()){
+    while (!WindowShouldClose()) {
+        frameCounter++;
+
+        if (frameCounter % 50 == 0) {
+            score++;
+        }
+
         // Update boundaries
-        Boundary circleBound = getCircleBound(circle_x, circle_y, circle_radius);
-        Boundary rectangleBound = getRectangleBound(axe_x, axe_y, axe_length);
+        Boundary playerBoundary = getCircleBoundary(playerX, playerY, playerRadius);
+        Boundary axeBoundary = getSquareBoundary(axeX, axeY, axeSize);
 
         // Check for collision
-        collision_with_axe = hasCollision(circleBound, rectangleBound);
+        gameOver = checkCollision(playerBoundary, axeBoundary);
 
         BeginDrawing();
         ClearBackground(WHITE);
 
-        if (collision_with_axe){
-            DrawText("Game over", 400, 200, 60, RED);
-        }
-        else{
-            // Draw circle and rectangle
-            DrawCircle(circle_x, circle_y, circle_radius, BLUE);
-            DrawRectangle(axe_x, axe_y, axe_length, axe_length, RED);
+        if (gameOver) {
+            DrawText("Game Over", screenWidth / 2 - 100, screenHeight / 2 - 30, 60, RED);
+        } else {
+            // Draw player (circle) and axe (square)
+            DrawCircle(playerX, playerY, playerRadius, BLUE);
+            DrawRectangle(axeX, axeY, axeSize, axeSize, RED);
 
-            // Move axe vertically
-            axe_y += direction;
-
-            if (axe_y > height || axe_y < 0){
-                direction = -direction;
+            // Move the axe vertically
+            axeY += axeDirection;
+            if (axeY > screenHeight || axeY < 0) {
+                axeDirection = -axeDirection;
             }
 
-            // Move circle
-            moveRight(circle_x, width);
-            moveLeft(circle_x, width);
+            // Move the player
+            moveRight(playerX, screenWidth);
+            moveLeft(playerX, screenWidth);
         }
         EndDrawing();
     }
