@@ -94,6 +94,9 @@ int main() {
         if (gameOver) {
             DrawText("Game Over", screenWidth / 2 - 100, screenHeight / 2 - 30, 60, RED);
         } else {
+            // Display score
+            DrawText(to_string(score).c_str(), 20, 20, 60, RED);
+
             // Draw player (circle) and axe (square)
             DrawCircle(playerX, playerY, playerRadius, BLUE);
             DrawRectangle(axeX, axeY, axeSize, axeSize, RED);
